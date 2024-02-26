@@ -3,26 +3,80 @@ const { Tag, Product, ProductTag } = require('../../models');
 
 // The `/api/tags` endpoint
 
-router.get('/', (req, res) => {
-  // find all tags
-  // be sure to include its associated Product data
+// GET all tags
+router.get('/', async (req, res) => {
+  try {
+    const tags = await Tag.findAll({
+      include: [Product] // Include associated Product data
+    });
+    res.json(tags);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
-router.get('/:id', (req, res) => {
-  // find a single tag by its `id`
-  // be sure to include its associated Product data
+// GET a single tag by id
+router.get('/:id', async (req, res) => {
+  try {
+    const tag = await Tag.findByPk(req.params.id, {
+      include: [Product] // Include associated Product data
+    });
+    if (tag) {
+      res.json(tag);
+    } else {
+      res.status(404).json({ message: 'Tag not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
-router.post('/', (req, res) => {
-  // create a new tag
+// POST a new tag
+router.post('/', async (req, res) => {
+  try {
+    const { tag_name } = req.body;
+    const tag = await Tag.create({ tag_name });
+    res.status(201).json(tag);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
-router.put('/:id', (req, res) => {
-  // update a tag's name by its `id` value
+// PUT update a tag's name by id
+router.put('/:id', async (req, res) => {
+  try {
+    const { tag_name } = req.body;
+    const tag = await Tag.findByPk(req.params.id);
+    if (tag) {
+      tag.tag_name = tag_name;
+      await tag.save();
+      res.json(tag);
+    } else {
+      res.status(404).json({ message: 'Tag not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
-router.delete('/:id', (req, res) => {
-  // delete on tag by its `id` value
+// DELETE a tag by id
+router.delete('/:id', async (req, res) => {
+  try {
+    const tag = await Tag.findByPk(req.params.id);
+    if (tag) {
+      await tag.destroy();
+      res.status(204).end();
+    } else {
+      res.status(404).json({ message: 'Tag not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 module.exports = router;
