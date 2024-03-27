@@ -16,28 +16,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// update product
-router.put('/:id', async (req, res) => {
-  try {
-    // update product data
-    const [numUpdatedRows, updatedProducts] = await Product.update(req.body, {
-      where: {
-        id: req.params.id,
-      },
-      returning: true, // This is important to get the updated rows
-    });
-
-    if (numUpdatedRows === 0) {
-      console.log("No product was updated.");
-    } else {
-      res.status(404).json({ message: 'Product not found' });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-
-});
 
 // create new product
 router.post('/', (req, res) => {
@@ -110,7 +88,7 @@ router.put('/:id', async (req, res) => {
       ]);
     }
 
-    return res.status(200).json(product);
+    return res.status(200).json(req.body);
   } catch (err) {
     console.error(err);
     res.status(400).json(err);
