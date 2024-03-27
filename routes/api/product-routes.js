@@ -16,6 +16,23 @@ router.get('/', async (req, res) => {
   }
 });
 
+// get product by id
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findByPk(req.params.id, {
+      include: [Category, Tag] // Include associated category and tag information
+    });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 
 // create new product
 router.post('/', (req, res) => {
