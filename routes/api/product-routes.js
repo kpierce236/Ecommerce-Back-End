@@ -47,19 +47,20 @@ router.post('/', (req, res) => {
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
+      if (req.body.tagIds && req.body.tagIds.length) {
         const productTagIdArr = req.body.tagIds.map((tag_id) => {
           return {
             product_id: product.id,
             tag_id,
           };
         });
-        return ProductTag.bulkCreate(productTagIdArr);
+        return ProductTag.bulkCreate(productTagIdArr)
+        
       }
       // if no product tags, just respond
       res.status(200).json(product);
     })
-    .then((productTagIds) => res.status(200).json(productTagIds))
+    .then((product) => res.status(200).json(product))
     .catch((err) => {
       console.log(err);
       res.status(400).json(err);
@@ -103,7 +104,7 @@ router.put('/:id', (req, res) => {
         });
       }
 
-      return res.json(product);
+      return res.json(req.body);
     })
     .catch((err) => {
       // console.log(err);
@@ -116,7 +117,7 @@ router.delete('/:id', async (req, res) => {
     const product = await Product.findByPk(req.params.id);
     if (product) {
       await product.destroy();
-      res.status(204).end();
+      res.status(204).json({ message: 'Product Deleted' }).end();
     } else {
       res.status(404).json({ message: 'Product not found' });
     }
