@@ -16,14 +16,19 @@ router.get('/', async (req, res) => {
   }
 });
 
-// get one product
-router.get('/:id', async (req, res) => {
+// update product
+router.put('/:id', async (req, res) => {
   try {
-    const product = await Product.findByPk(req.params.id, {
-      include: [Category, Tag] 
+    // update product data
+    const [numUpdatedRows, updatedProducts] = await Product.update(req.body, {
+      where: {
+        id: req.params.id,
+      },
+      returning: true, // This is important to get the updated rows
     });
-    if (product) {
-      res.json(product);
+
+    if (numUpdatedRows === 0) {
+      console.log("No product was updated.");
     } else {
       res.status(404).json({ message: 'Product not found' });
     }
@@ -92,19 +97,19 @@ router.put('/:id', (req, res) => {
             };
           });
 
-            // figure out which ones to remove
-          const productTagsToRemove = productTags
-          .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
-          .map(({ id }) => id);
-                  // run both actions
-          return Promise.all([
-            ProductTag.destroy({ where: { id: productTagsToRemove } }),
-            ProductTag.bulkCreate(newProductTags),
-          ]);
-        });
-      }
+      // figure out which ones to remove
+      const productTagsToRemove = productTags
+        .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
+        .map(({ id }) => id);
 
-      return res.json(req.body);
+      // run both actions
+      await Promise.all([
+        ProductTag.destroy({ where: { id: productTagsToRemove } }),
+        ProductTag.bulkCreate(newProductTags),
+      ]);
+    }
+
+      return res.json(product);
     })
     .catch((err) => {
       // console.log(err);
@@ -112,12 +117,14 @@ router.put('/:id', (req, res) => {
     });
 });
 
+
+
 router.delete('/:id', async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
     if (product) {
       await product.destroy();
-      res.status(204).json({ message: 'Product Deleted' }).end();
+      res.status(200).json({ message: 'Product Deleted' }).end();
     } else {
       res.status(404).json({ message: 'Product not found' });
     }
