@@ -83,7 +83,11 @@ This appilcation is a Eccomerce API.
 
 ### Demo of the Application
 
-![Demo of the Appilcation]( "Demo of the Appilcation")
+Check out the application functionality in action: 
+
+*Click the gif to view the full video from Google Drive*
+
+[![Demo of the Application](images/demo.gif)](https://drive.google.com/file/d/1LMWZeoS0gkrzx14pSf4oakkeq4jFsN0Q/view)
 
 ## Credits
 
@@ -98,6 +102,7 @@ This appilcation is a Eccomerce API.
 - [Sequelize](https://www.npmjs.com/package/sequelize)
 - [MySQL2](https://www.npmjs.com/package/mysql2)
 - [dotenv](https://www.npmjs.com/package/dotenv)
+- [Insomnia](https://insomnia.rest/)
 
 
 ## License
